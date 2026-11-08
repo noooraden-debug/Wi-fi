@@ -1,4 +1,3 @@
-javascript
 /* WiFi Hub — الخادم الداخلي (قاعدة بيانات + واجهة برمجية + مزامنة لحظية)
  *
  * التشغيل:  node server/server.js   (أو npm start)
@@ -68,10 +67,9 @@ function tokenOf(req, url) {
   return url.searchParams.get('token') || '';
 }
 
-/* إصلاح دالة جلب الآي بي للمشترك على السيرفرات الخارجية */
 function clientInfo(req) {
   const forwarded = req.headers['x-forwarded-for'];
-  const ip = forwarded ? String(forwarded).split(',')[0] : req.socket.remoteAddress;
+  const ip = forwarded ? String(forwarded).split(',') : req.socket.remoteAddress;
   return String(ip || '').trim();
 }
 
@@ -223,14 +221,13 @@ async function api(req, res, url) {
     return sendJSON(res, 200, { ok: true, plan, user: publicUser(fresh, true), message: `تم تفعيل باقة «${plan.label}» — ${plan.days} يوم` });
   }
 
-  /* ---------- طلب باقة ---------- */
+  /* ---------- الطلبات ---------- */
   if (p === '/api/request' && method === 'POST') {
     if (!me) return sendJSON(res, 401, { ok: false, error: 'الجلسة منتهية' });
     const b = await readBody(req);
     const plan = String(b.plan || '');
-يُرجى استخدام الرمز البرمجي بحذر.
-const r = createRequest({ username: me.username, plan, phone: String(b.phone || me.phone || '').slice(0, 40) });
-logEvent('request.created', me.username, { plan });
+    const r = createRequest({ username: me.username, plan, phone: String(b.phone || me.phone || '').slice(0, 40) });
+    logEvent('request.created', me.username, { plan });
 broadcast('requests.changed', { username: me.username });
 if (getSetting('autoApprove', '0') === '1') {
 const pl = planById(plan);
@@ -336,7 +333,7 @@ events: recentEvents(30)
 if (p === '/api/admin/codes' && method === 'POST') {
 const b = await readBody(req);
 const qty = Math.max(1, Math.min(500, Number(b.qty) || 1));
-const plan = String(b.plan || (getPlans()[0] || {}).id);
+const plan = String(b.plan || (getPlans() || {}).id);
 if (!planById(plan)) return sendJSON(res, 400, { ok: false, error: 'باقة غير معروفة' });
 const maxDev = Math.max(1, Math.min(99, Number(b.maxDev) || 3));
 let expires = Number(b.expiresAt) || 0;
@@ -385,7 +382,7 @@ return sendJSON(res, 200, { ok: true, end });
 }
 if (method === 'POST' && sub[2] === 'promote') {
 const b = await readBody(req);
-const plan = planById(String(b.plan || u.plan || (getPlans()[0] || {}).id));
+const plan = planById(String(b.plan || u.plan || (getPlans() || {}).id));
 if (!plan) return sendJSON(res, 400, { ok: false, error: 'باقة غير معروفة' });
 const days = Math.max(1, Math.min(3650, Number(b.days) || plan.days));
 const base = u.sub_end && u.sub_end > Date.now() ? u.sub_end : Date.now();
@@ -413,7 +410,7 @@ return sendJSON(res, 200, { ok: true });
 }
 const b = await readBody(req);
 const u = findUser(r.username);
-const plan = planById(String(b.plan || r.plan || (getPlans()[0] || {}).id));
+const plan = planById(String(b.plan || r.plan || (getPlans() || {}).id));
 if (!plan) return sendJSON(res, 400, { ok: false, error: 'باقة غير معروفة' });
 const days = Math.max(1, Math.min(3650, Number(b.days) || plan.days));
 let end = Date.now() + days * 864e5;
