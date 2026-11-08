@@ -19,15 +19,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "▶ إعدادات البناء: $CONFIG"
-CFG_URL=$(node -e "console.log(require('$CONFIG').configUrl||'')")
-READ_TOKEN=$(node -e "console.log(require('$CONFIG').readToken||'')")
-REQ_TOKEN=$(node -e "console.log(require('$CONFIG').requestToken||'')")
+API_URL=$(node -e "console.log(require('$CONFIG').apiUrl||'')")
+SERVER_PORT=$(node -e "console.log(require('$CONFIG').serverPort||8080)")
 
 # متغيّرات البيئة تتغلّب على ملف الإعدادات (تُستخدم في GitHub Actions)
-[ -n "${WIFIHUB_CONFIG_URL:-}" ] && CFG_URL="$WIFIHUB_CONFIG_URL"
-[ -n "${WIFIHUB_READ_TOKEN:-}" ] && READ_TOKEN="$WIFIHUB_READ_TOKEN"
-[ -n "${WIFIHUB_REQUEST_TOKEN:-}" ] && REQ_TOKEN="$WIFIHUB_REQUEST_TOKEN"
-echo "  configUrl: ${CFG_URL:-(غير محدد)}"
+[ -n "${WIFIHUB_API_URL:-}" ] && API_URL="$WIFIHUB_API_URL"
+echo "  apiUrl: ${API_URL:-(نفس الأصل)}"
+echo "  serverPort: $SERVER_PORT"
 
 WORK="$PROJ/build"
 rm -rf "$WORK"; mkdir -p "$WORK/classes" "$WORK/res" "$WORK/assets" "$OUT"
@@ -37,10 +35,10 @@ cp -r "$PROJ/../web/." "$WORK/assets/web/"
 
 echo "▶ حقن إعدادات البناء"
 cat > "$WORK/assets/web/js/build-config.js" <<EOF
+/* إعدادات البناء — تُحقن وقت البناء */
 globalThis.WIFIHUB_BUILD = {
-  configUrl: "${CFG_URL}",
-  readToken: "${READ_TOKEN}",
-  requestToken: "${REQ_TOKEN}"
+  apiUrl: "${API_URL}",
+  serverPort: ${SERVER_PORT}
 };
 EOF
 
