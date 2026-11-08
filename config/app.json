@@ -1,6 +1,0 @@
-{
-  "_howto": "ضع رابط ملف الإعدادات هنا (مثال: https://raw.githubusercontent.com/OWNER/REPO/main/hub.json)، أو استخدم GitHub Secret باسم WIFIHUB_CONFIG_URL أثناء البناء في GitHub Actions. اترك readToken فارغاً للمستودع العام، وضع توكن قراءة إذا كان المستودع خاصاً.",
-  "configUrl": "",
-  "readToken": "",
-  "requestToken": ""
-}
