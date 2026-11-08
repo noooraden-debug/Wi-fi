@@ -1,1 +1,60 @@
+name: بناء تطبيق WiFi Hub
 
+# عند كل رفع إلى main يُبنى ملف APK تلقائياً — لا يحتاج المالك أي برنامج محلي.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: اختبار الخادم الداخلي
+        run: node tools/api-test.mjs
+      - name: اختبار محرك الراوتر
+        run: bash tools/run-test.sh
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: إعداد Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: تثبيت Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: بناء التطبيق
+        env:
+          WIFIHUB_API_URL: ${{ secrets.WIFIHUB_API_URL }}
+        run: |
+          chmod +x android/build.sh
+          ANDROID_HOME=$ANDROID_HOME ./android/build.sh
+
+      - name: رفع التطبيق كملف release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/dist/wifihub.apk
+          tag_name: app
+          name: WiFi Hub
+          body: |
+            تطبيق WiFi Hub — حمّله وانشره للمشتركين.
+            الرابط: https://github.com/${{ github.repository }}/releases/tag/app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wifihub-apk
+          path: android/dist/wifihub.apk
