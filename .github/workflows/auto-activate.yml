@@ -1,1 +1,37 @@
+name: تسجيل طلبات الاشتراك
 
+# عندما يضغط مشترك زر «اطلب الاشتراك» من داخل التطبيق، يُنشأ Issue في هذا المستودع.
+# هذا التدفق يسجّل الطلب في hub.json (قائمة requests) ويغلق الـ Issue — ليظهر للمالك في لوحة الإدارة.
+# التفعيل نفسه يبقى بيد المالك (ضغطة «تفعيل» واحدة)، ولا يوجد اشتراك تلقائي.
+# إن أراد المالك التفعيل الآلي فجعل settings.autoApprove = true في hub.json.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: تسجيل الطلب في hub.json
+        env:
+          ISSUE_BODY: ${{ toJSON(github.event.issue.body) }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          node .github/scripts/activate.js
+
+      - name: إغلاق الطلب
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.ISSUE_NUMBER),
+              state: 'closed'
+            });
