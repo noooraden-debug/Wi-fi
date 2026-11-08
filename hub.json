@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "WiFi Hub",
+    "owner": "اسم المالك",
+    "whatsapp": "963957869853",
+    "currency": "ريال",
+    "admin": {
+      "username": "admin",
+      "salt": "d8d5c96f24e8e414b6ea71cce2fc999e",
+      "hash": "51feeca627310fc3f204e9cfe35f8b58a7da25b2ef17f5507a46ec8d65392a92"
+    }
+  },
+  "settings": {
+    "autoApprove": false,
+    "allowSelfService": true,
+    "pollSeconds": 30,
+    "features": {
+      "wifi": true,
+      "block": true,
+      "freeze": true,
+      "limit": true,
+      "rename": true,
+      "reboot": false
+    }
+  },
+  "plans": [
+    {
+      "id": "m1",
+      "label": "شهري",
+      "days": 30,
+      "price": 100,
+      "maxDev": 3
+    },
+    {
+      "id": "m3",
+      "label": "3 أشهر",
+      "days": 90,
+      "price": 250,
+      "maxDev": 5
+    },
+    {
+      "id": "m6",
+      "label": "6 أشهر",
+      "days": 180,
+      "price": 450,
+      "maxDev": 10
+    },
+    {
+      "id": "m12",
+      "label": "سنة",
+      "days": 365,
+      "price": 700,
+      "maxDev": 15
+    }
+  ],
+  "router": {
+    "base": "",
+    "username": "root",
+    "password": "CHANGE_ME",
+    "sessionTimeout": 3600,
+    "wanIf": "wan",
+    "lanIf": "lan",
+    "wifiIfaces": []
+  },
+  "codes": [],
+  "subscribers": [],
+  "requests": [],
+  "logs": [],
+  "users": []
+}
