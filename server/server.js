@@ -227,7 +227,7 @@ async function api(req, res, url) {
     const b = await readBody(req);
     const plan = String(b.plan || '');
     const r = createRequest({ username: me.username, plan, phone: String(b.phone || me.phone || '').slice(0, 40) });
-    logEvent('request.created', me.username, { plan });
+logEvent('request.created', me.username, { plan });
 broadcast('requests.changed', { username: me.username });
 if (getSetting('autoApprove', '0') === '1') {
 const pl = planById(plan);
